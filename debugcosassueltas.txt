@@ -1,0 +1,34 @@
+r.table('geo').get(1)['location'].distance(
+    r.table('geo').get(2)['location']).run()
+
+print(r.table("geo").filter({'name': 'San Diego'}).run())
+'name': 'San Diego'
+
+r.table('geo').get('2')['location'].to_geojson().run()
+
+r.table("users").filter({"id": 2}).pluck('location').to_geojson().run()
+
+ r.db('test').table_drop('geo').run()
+
+ r.db('test').table_create('geo', primary_key='id').run()
+
+
+r.table('geo').get(1)['location'].to_geojson().run()
+
+r.table('geo').insert(
+      {
+        'id': 3,
+        'name': 'Boston',
+        'location': r.polygon(r.point(42.36111, -71.06257), 
+                    r.point(42.36083, -71.06137), 
+                    r.point(42.35921, -71.06148), 
+                    r.point(42.35916, -71.06272))
+      }).run()
+
+r.line(r.point(0,0), r.point(0,5), r.point(5,5), r.point(5,0), r.point(0,0))
+r.polygon(r.point(0,0), r.point(0,5), r.point(5,5), r.point(5,0), r.point(0,0))
+
+[42.36111, -71.06257],
+[42.36083, -71.06137],
+[42.35921, -71.06148],
+[42.35916, -71.06272]

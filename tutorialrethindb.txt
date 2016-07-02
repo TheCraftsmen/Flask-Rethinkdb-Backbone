@@ -1,0 +1,75 @@
+rethinkdb python geospatial
+
+1 probando libreria python
+	* desde la terminal correr rethinkdb para correr la base de datos
+	* entrar en la consola python:
+		import rethinkdb as r #importa la libreria
+		//crea la conexion
+		r.connect( "localhost", 28015).repl() #genera la conexion
+		
+		//borrar tabla si existe
+		r.db('test').table_drop('geo').run()
+
+		//crear tabla con primarykey id
+		r.db('test').table_create('geo', primary_key='id').run()
+
+
+	*agregar datos tipo puntos en la tabla:
+		r.table('geo').insert([
+	  	{
+	    	'id': 1,
+	    	'name': 'San Francisco',
+	    	'location': r.point(-122.423246,37.779388)
+	  	},
+	  	{
+	    	'id': 2,
+	    	'name': 'San Diego',
+	    	'location': r.point(-117.220406,32.719464)
+	 	}
+		]).run()
+	
+	*distancia entre puntos:
+		r.table('geo').get(1)['location'].distance(
+    	r.table('geo').get(2)['location']).run()
+    
+    *indexar la tabla por puntos de geolocalizacion:
+    	r.table('geo').index_create('location', geo=True).run()
+
+
+   	*el punto mas cercano a un punto dentro de la base de datos
+   		point = r.point(-122.422876,37.777128)  # San Francisco
+		r.table('geo').get_nearest(point, index='location')
+
+
+	*consultas simples en rethinkdb
+		>>> cursor = r.table("geo").filter({"id": 2}).run()
+		>>> for row in cursor:
+		...     print(row)
+
+		para mas informacion de consultas
+		https://rethinkdb.com/docs/sql-to-reql/python/
+
+
+	*convertir consulta a tipo geojson
+		r.table('geo').get(1)['location'].to_geojson().run()
+
+	*ejemplo de como agregar un poligono a la base de datos
+	otra opcion es r.line
+		r.table('geo').insert(
+      	{
+        'id': 3,
+        'name': 'Boston',
+        'location': r.polygon(r.point(42.36111, -71.06257), 
+                    r.point(42.36083, -71.06137), 
+                    r.point(42.35921, -71.06148), 
+                    r.point(42.35916, -71.06272))
+      	}).run()
+
+    *consulta del poligono en la base de datos
+    	r.table('geo').get(3)['location'].to_geojson().run()
+
+
+
+
+
+
